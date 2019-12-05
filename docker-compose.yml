@@ -1,0 +1,51 @@
+version: '3'
+services:
+  amq:
+    container_name: amq
+    image: webcenter/activemq:latest
+    environment:
+      - ACTIVEMQ_CONFIG_MINMEMORY=512
+      - ACTIVEMQ_CONFIG_MAXMEMORY=1024
+    ports:
+      - 61616:61616
+      - 8161:8161  
+    networks:
+      - dev
+  es:
+    container_name: es
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.0
+    environment:
+      - discovery.type=single-node
+    ports:
+      - 9200:9200
+    networks:
+      - dev
+  kibana:
+    container_name: kibana
+    image: docker.elastic.co/kibana/kibana:7.4.0
+    environment:
+      - SERVER_NAME=localhost
+      - ELASTICSEARCH_HOSTS=http://es:9200
+    ports:
+      - 5601:5601
+    networks:
+      - dev
+    depends_on:
+      - es
+  logstash:
+    container_name: logstash
+    image: docker.pkg.github.com/mmacphail/activemq-logstash-docker-image/activemq-logstash:0.0.1
+    networks:
+      - dev
+    environment:
+      - ACTIVEMQ_BROKER_URL=tcp://amq:61616
+      - ACTIVEMQ_DESTINATION=hello-world
+      - ELASTICSEARCH_URL=http://es:9200
+      - ELASTICSEARCH_INDEX=testindex 
+    depends_on:
+      - amq
+      - es
+
+networks:
+  dev:
+    driver: bridge
