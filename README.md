@@ -8,7 +8,7 @@
   </a>
 </p>
 
-> Example project to deploy an ELK stack to kubernetes
+> Demo project to deploy an ELK stack and an ActiveMQ to kubernetes
 
 ## Dependencies
 
